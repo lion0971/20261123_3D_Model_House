@@ -22,17 +22,29 @@ import { attachSwitchHintsToScene, attachDoorHintsToScene } from '../ui/hints.js
 import { attachDoorIndicatorsToScene } from '../doors/doorIndicator.js';
 import { applyDayNight, daySlider } from '../ui/slider.js';
 import { finishLoading } from '../ui/loadingScreen.js';
+import { schedulePipeOverlapCheck } from '../physics/pipeOverlap.js';
 
-// 整棟建築 GLTF 載入完成後的組裝入口（由 main.js 呼叫）
-export function buildScene(gltf) {
-  scene.add(gltf.scene);
-  gltf.scene.updateMatrixWorld(true);
+// 組裝入口（由 main.js 呼叫）
+// buildingGltf：房子模型
+// pipeModels：[{ name, gltf }]，每個管路檔一筆，name 為檔名（不含副檔名）
+export function buildScene(buildingGltf, pipeModels = []) {
+  const buildingRoot = buildingGltf.scene;
+  const pipeRoots = pipeModels.map(m => m.gltf.scene);
+  const allRoots = [buildingRoot, ...pipeRoots];
+
+  allRoots.forEach(root => {
+    scene.add(root);
+    root.updateMatrixWorld(true);
+  });
+
+  // 對所有模型（建築 + 管路）逐一遍歷
+  const traverseAll = (fn) => allRoots.forEach(root => root.traverse(fn));
 
   // 第一遍：登記滑門 / 上掀門
-  gltf.scene.traverse((obj) => registerDoorFromTraverse(obj));
+  traverseAll((obj) => registerDoorFromTraverse(obj));
 
   // 第一遍（續）：收集出水口 / 排水口空物件
-  gltf.scene.traverse((obj) => {
+  traverseAll((obj) => {
     const name = obj.name.toLowerCase();
     if (Object.values(PIPE_CONFIG).some(cfg => cfg.outletKey === name)) outletObjects[name] = obj;
     if (Object.values(PIPE_CONFIG).some(cfg => cfg.drainKey === name)) drainObjects[name] = obj;
@@ -42,7 +54,7 @@ export function buildScene(gltf) {
   const allDrainPipeNames = new Set(Object.values(PIPE_CONFIG).flatMap(cfg => cfg.drainPipes));
 
   // 第二遍：處理 mesh
-  gltf.scene.traverse((mesh) => {
+  traverseAll((mesh) => {
     if (!mesh.isMesh) return;
     const name = mesh.name.toLowerCase();
     const parentName = (mesh.parent && mesh.parent.name) ? mesh.parent.name.toLowerCase() : '';
@@ -131,7 +143,7 @@ export function buildScene(gltf) {
 
   // 桌子虛擬碰撞範圍（自動量測）
   const diningTableMesh = cachedSceneMeshes.find(m => m.name.toLowerCase().includes('dining_table'))
-    ?? gltf.scene.getObjectByName('dining_table');
+    ?? allRoots.map(root => root.getObjectByName('dining_table')).find(Boolean);
   if (diningTableMesh) {
     const box = new THREE.Box3().setFromObject(diningTableMesh);
     DINING_TABLE_BOUNDS.minX = box.min.x;
@@ -184,6 +196,11 @@ export function buildScene(gltf) {
   applyDayNight(parseFloat(daySlider.value));
   state.currentBulbStrength = state.targetBulbStrength;
   applyBulbStrength(state.currentBulbStrength);
+
+  // 管路交錯偵測：閒置時計算一次，結果快取供透視模式顯示
+  schedulePipeOverlapCheck(
+    pipeModels.map(m => ({ name: m.name, root: m.gltf.scene }))
+  );
 
   // 編譯預熱後才揭曉畫面
   warmUpAndReveal();

@@ -22,6 +22,7 @@ import { startAnimationLoop } from './loop/animate.js';
 import { loadAllAudio } from './audio/sound.js';
 import { subscribeFilterUsage } from './filter/filterState.js';
 import { exitApp, showCloseFallback } from './ui/endScreen.js';
+import { PIPE_MODEL_FILES } from './data/pipeModels.js';
 
 // 互動 / UI / 場景模組（import 即生效）
 import './core/controls.js';
@@ -33,6 +34,7 @@ import './ui/dashboard.js';
 import './ui/warnings.js';
 import './ui/slider.js';
 import './ui/hints.js';
+import './ui/overlapWarning.js';
 import './filter/filterUI.js';
 import './loop/sun.js';
 import './interaction/keyboard.js';
@@ -57,9 +59,24 @@ rgbeLoader.load(CONFIG.MODELS.HDRI, (hdr) => {
 loadAllAudio();
 subscribeFilterUsage();
 
-// 建築模型載入後組裝場景
-gltfLoader.load(CONFIG.MODELS.BUILDING, (gltf) => {
-  buildScene(gltf);
+// 建築與各管路檔並行載入；單一管路檔失敗只記錄錯誤，不影響其他模型
+const buildingPromise = gltfLoader.loadAsync(CONFIG.MODELS.BUILDING);
+const pipePromises = PIPE_MODEL_FILES.map(url =>
+  gltfLoader.loadAsync(url).catch(err => {
+    console.error(`[Pipe] 載入失敗：${url}`, err);
+    return null;
+  })
+);
+
+Promise.all([buildingPromise, ...pipePromises]).then(([buildingGltf, ...pipeGltfs]) => {
+  const pipeModels = PIPE_MODEL_FILES
+    .map((url, i) => ({
+      name: url.split('/').pop().replace(/\.glb$/i, ''),
+      gltf: pipeGltfs[i],
+    }))
+    .filter(m => m.gltf);
+
+  buildScene(buildingGltf, pipeModels);
 });
 
 // 啟動主動畫迴圈

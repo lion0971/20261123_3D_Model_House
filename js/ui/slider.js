@@ -57,6 +57,12 @@ sliderWrap.className = 'sun-slider-wrap';
 sliderWrap.style.opacity = '0'; // 其他模組會讀取此值判斷是否可見，保留 inline
 document.body.appendChild(sliderWrap);
 
+// ── 滑桿標題（放在膠囊內，透明度隨 sliderWrap 自動同步）──
+const sliderTitle = document.createElement('div');
+sliderTitle.className = 'sun-slider-title';
+sliderTitle.textContent = '日落 ／ 日出';
+sliderWrap.appendChild(sliderTitle);
+
 // 左側圓球（白天亮、夜晚暗）
 const sunOrb = document.createElement('span');
 sunOrb.className = 'sun-orb sun-orb--sun';
@@ -128,9 +134,9 @@ function formatDeg(rad) {
 
 function updateDialTip() {
   sunDialTip.innerHTML =
-    `<span class="sr">日出</span> ${formatDeg(sunriseAz)}` +
+    `<span class="ss">日落</span> ${formatDeg(sunsetAz)}` +
     `<span class="sep">|</span>` +
-    `<span class="ss">日落</span> ${formatDeg(sunsetAz)}`;
+    `<span class="sr">日出</span> ${formatDeg(sunriseAz)}` ;
 }
 
 function showDialTip() {
@@ -270,7 +276,6 @@ export function applyDayNight(t) {
   const elevation = Math.sin(n * Math.PI) * SUN_MAX_ELEVATION;
   const elevRatio = elevation / SUN_MAX_ELEVATION;
 
-  // 圓球亮度：白天太陽較亮，夜晚月亮較亮
   // 圓球亮度依滑桿位置變化：0 時太陽球最亮、100 時月亮球最亮
   sunOrb.style.opacity = String(1 - n * 0.65);
   moonOrb.style.opacity = String(0.35 + n * 0.65);

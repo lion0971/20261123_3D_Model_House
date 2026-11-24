@@ -3,6 +3,7 @@ import { state, cachedSceneMeshes, bulbMeshes } from '../core/state.js';
 import { controls } from '../core/controls.js';
 import { scene, renderer } from '../core/renderer.js';
 import { PIPE_MATERIALS } from '../water/pipes.js';
+import { showOverlapWarning, hideOverlapWarning } from './overlapWarning.js';
 import { checkCurrentCollision } from '../physics/collision.js';
 import { applyBulbStrength } from '../loop/bulbs.js';
 import { sunLight, sunMesh } from '../loop/sun.js';
@@ -84,6 +85,9 @@ menuPanel.appendChild(xrayBtn);
 
 // ── 管路透視模式切換 ──
 export function toggleXRayMode(enable) {
+  if (enable) showOverlapWarning();
+  else hideOverlapWarning();
+
   state.isNoclipMode = enable;
   if (!enable) state.isStuckInWall = checkCurrentCollision();
 

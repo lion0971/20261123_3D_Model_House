@@ -544,6 +544,21 @@ body {
    ☀️🌙 太陽軌跡滑桿
    由 js/ui/slider.js 建立
    ========================================== */
+/* 滑桿標題（膠囊上方，隨 .sun-slider-wrap 一起淡入淡出） */
+/* 滑桿標題（膠囊內，與圓球、滑桿同排） */
+.sun-slider-title {
+  position: static;
+  transform: none;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: rgba(255, 255, 255, 0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  white-space: nowrap;
+  margin: 0 10px;
+}
+
 .sun-slider-wrap {
   position: fixed;
   bottom: 28px;
