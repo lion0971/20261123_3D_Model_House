@@ -1,10 +1,10 @@
 // scene-config.js
 const isGitHub = window.location.hostname.includes('github.io');
-const basePath = isGitHub ? '/Graduate_3D_Model_House/' : './';
+const basePath = isGitHub ? '/20261123_3D_Model_House/' : './';
 
 export const CONFIG = {
     MODELS: {
-        BUILDING: `${basePath}models/20260805.glb`,
+        BUILDING: `${basePath}models/building.glb`,
         HDRI: `${basePath}hdri/studio-0623.hdr`
     },
     CAMERA: {
