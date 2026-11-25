@@ -3,6 +3,7 @@ import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';          // 新增
 import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib.js';
 import { CONFIG } from '../../scene-config.js';
 
@@ -39,6 +40,7 @@ composer.addPass(new UnrealBloomPass(
   new THREE.Vector2(window.innerWidth * 0.2, window.innerHeight * 0.2),
   0.2, 0.5, 0.85
 ));
+composer.addPass(new OutputPass());   // 新增：套用色调映射、曝光与 sRGB 输出（必须是最后一个 pass）
 
 export const labelRenderer = new CSS2DRenderer();
 labelRenderer.setSize(window.innerWidth, window.innerHeight);

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { state } from '../core/state.js';
 import { scene, renderer } from '../core/renderer.js';
 import { sunLight, sunMesh } from '../loop/sun.js';
-import { LIGHTS_ON_ELEV_RATIO, DEFAULT_DAY_VALUE } from '../data/constants.js';
+import { LIGHTS_ON_ELEV_RATIO, DEFAULT_DAY_VALUE, WEATHER_LAT } from '../data/constants.js';
 import { isMobile } from '../core/controls.js';
 
 // ── 太陽軌跡設定（方位角，弧度）──
@@ -10,7 +10,24 @@ import { isMobile } from '../core/controls.js';
 // 預設 +75° / -75°，與原本的日出日落位置一致
 const DEFAULT_SUNRISE_AZ_DEG = 75;
 const DEFAULT_SUNSET_AZ_DEG = -75;
-const SUN_MAX_ELEVATION = Math.PI / 4;
+
+// 由建築所在緯度與日期計算正午太陽高度角（弧度）
+function solarDeclinationDeg(date = new Date()) {
+  const start = new Date(date.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date - start) / 86400000);
+  return -23.44 * Math.cos((2 * Math.PI / 365) * (dayOfYear + 10));
+}
+
+// 正午太陽高度（度）：極地可能為負（極夜），近赤道春秋分可能接近 90
+const noonElevationDeg = 90 - Math.abs(WEATHER_LAT - solarDeclinationDeg());
+
+// 動畫模型需要一個正的最大高度：夾在 5°～85° 之間
+// 下限避免除以 0 與太陽壓在地平線下，上限避免太陽正好在頭頂時陰影消失
+const SUN_MIN_ELEVATION_DEG = 5;
+const SUN_MAX_ELEVATION_DEG = 85;
+const SUN_MAX_ELEVATION = THREE.MathUtils.degToRad(
+  THREE.MathUtils.clamp(noonElevationDeg, SUN_MIN_ELEVATION_DEG, SUN_MAX_ELEVATION_DEG)
+);
 
 let sunriseAz = THREE.MathUtils.degToRad(DEFAULT_SUNRISE_AZ_DEG);
 let sunsetAz = THREE.MathUtils.degToRad(DEFAULT_SUNSET_AZ_DEG);
@@ -264,9 +281,6 @@ sunDial.addEventListener('dblclick', (e) => {
 sliderWrap.appendChild(sunDial);
 updateDialVisuals();
 
-// 日夜核心：t 為滑桿值 0~100
-// n 決定太陽在軌跡上的位置；方位角沿日出→日落的弧移動，高度為正弦曲線
-// elevRatio（兩端 0、中間 1）用來算亮度、色溫、曝光
 export function applyDayNight(t) {
   const n = t / 100;
 
@@ -290,7 +304,8 @@ export function applyDayNight(t) {
   sunLight.position.set(sx, sy, sz);
   sunMesh.position.set(sx, sy, sz);
 
-  sunLight.intensity = Math.sin(elevation) * 3.6;
+  // 改用 elevRatio：正午為 3.0，日出日落趨近 0（不再被高度角二次壓低）
+  sunLight.intensity = THREE.MathUtils.lerp(0, 3.0, elevRatio);
 
   const dawnColor = new THREE.Color(0xffd0a0);
   const noonColor = new THREE.Color(0xfff5e0);
@@ -299,6 +314,10 @@ export function applyDayNight(t) {
   sunMesh.material.color.copy(sunColor);
 
   renderer.toneMappingExposure = 0.2 + elevRatio * 1.0;
+
+  // 新增：HDR 環境光隨時間變化（夜 0.4、正午 1.0）
+  // 若 three.js 版本低於 r163，此屬性不存在，會沒有作用但不會報錯
+  scene.environmentIntensity = THREE.MathUtils.lerp(0.4, 1.0, elevRatio);
 
   const ambLight = scene.children.find(o => o.isAmbientLight);
   if (ambLight) ambLight.intensity = 0.005 + elevRatio * 0.5;
@@ -318,6 +337,10 @@ export function applyDayNight(t) {
     state.targetBulbStrength = 0.0;
   }
 }
+
+// 新增：載入時套用一次目前滑桿值，避免太陽光維持初始值 0
+// 放在函式定義之後、input 事件綁定之前
+applyDayNight(parseFloat(daySlider.value));
 
 daySlider.addEventListener('input', () => {
   if (state.isXRayMode) return;
