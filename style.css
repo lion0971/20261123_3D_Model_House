@@ -593,13 +593,13 @@ body {
 }
 
 .sun-orb--sun {
-  background: radial-gradient(circle at 35% 35%, #ffd0a0, #ff8a4c 70%);
-  box-shadow: 0 0 12px rgba(255, 138, 76, 0.6);
+  background: radial-gradient(circle at 35% 35%, #bfe6ff, #4facfe 70%);
+  box-shadow: 0 0 12px rgba(79, 172, 254, 0.6);
 }
 
 .sun-orb--moon {
-  background: radial-gradient(circle at 35% 35%, #bfe6ff, #4facfe 70%);
-  box-shadow: 0 0 12px rgba(79, 172, 254, 0.6);
+  background: radial-gradient(circle at 35% 35%, #ffd0a0, #ff8a4c 70%);
+  box-shadow: 0 0 12px rgba(255, 138, 76, 0.6);
 }
 
 /* 滑桿軌跡：已填色部分由 JS 設定 --fill */
@@ -792,7 +792,7 @@ body {
 }
 
 /* ==========================================
-   📱 手機直式：以視窗百分比重新排版
+   手機直式：以視窗百分比重新排版
    ========================================== */
 @media (max-width: 768px) {
 

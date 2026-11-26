@@ -61,11 +61,10 @@ index.html                  入口頁，載入 importmap 與 js/main.js
 style.css                   全域樣式（離開按鈕、載入畫面、說明框、滑桿、結束畫面等）
 scene-config.js             場景設定（模型路徑、相機起點，支援 GitHub Pages 子路徑）
 models/
-  20260805.glb              建築本體（不含管路）
+  building.glb              建築本體（不含管路）
   pipes/                    管路模型，每個檔案一組管路
-    pipe_kitchen.glb
-    pipe_bath.glb
-    pipe_toilet.glb
+    pipe_outlet.glb
+    pipe_drain.glb
 hdri/
   studio-0623.hdr           環境貼圖
 textures/
@@ -209,7 +208,6 @@ js/
 ### 太陽軌跡
 
 - 日出與日落各為一個地平線方位角，預設 +75° 與 -75°。
-- 滑桿值 `n`（0～1）決定太陽位置：方位角沿較短的弧從日出走到日落，高度為 `sin(nπ) × 45°`。
 - 滑桿圓球亮度依 `n` 變化：0 時太陽球最亮，100 時月亮球最亮。
 - 圓盤與滑桿共用同一組方位角，拖曳時以較近的點為準，雙擊還原預設。
 - 管路透視模式中滑桿與圓盤隱藏，`applyDayNight` 不會被使用者觸發。

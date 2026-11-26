@@ -64,8 +64,8 @@ sliderStyleTag.textContent = `
   transform: translateX(-50%) translateY(0);
 }
 .sun-dial-tip .sep { margin: 0 8px; opacity: 0.4; }
-.sun-dial-tip .sr { color: #7ec8ff; }
-.sun-dial-tip .ss { color: #ff9f5a; }`;
+.sun-dial-tip .sr { color: #ff9f5a; }
+.sun-dial-tip .ss { color: #7ec8ff; }`;
 document.head.appendChild(sliderStyleTag);
 
 // ── 滑桿外框 ──
@@ -137,8 +137,8 @@ function makeDot(color, glow) {
   sunDial.appendChild(dot);
   return dot;
 }
-const sunriseDot = makeDot('#7ec8ff', 'rgba(126,200,255,0.8)');
-const sunsetDot = makeDot('#ff9f5a', 'rgba(255,159,90,0.8)');
+const sunriseDot = makeDot('#ff9f5a', 'rgba(255,159,90,0.8)');
+const sunsetDot = makeDot('#7ec8ff', 'rgba(126,200,255,0.8)');
 
 // ── 提示視窗（靠近即顯示）──
 const sunDialTip = document.createElement('div');
