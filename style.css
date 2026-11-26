@@ -404,14 +404,13 @@ body {
 /* ==========================================
    📱 手機版說明框：收合 / 展開 / 放大文字
    ========================================== */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   #instructions {
     pointer-events: auto;
     width: 300px;
     padding: 20px 24px;
   }
 
-  /* 收合：縮成一個點並隱藏，改由 #instructions-fab 顯示 */
   #instructions:not(.expanded) {
     transform: scale(0.05);
     opacity: 0;
@@ -425,7 +424,7 @@ body {
       visibility 0s linear 0.7s;
   }
 
-  /* 展開：立即可見 */
+
   #instructions.expanded {
     visibility: visible;
     transition:
@@ -450,7 +449,7 @@ body {
   #instructions.expanded .instructions-close-btn {
     display: flex;
   }
-}
+} */
 
 /* ==========================================
    ◉ 左下角收合按鈕（手機）
@@ -789,5 +788,62 @@ body {
 
   50% {
     box-shadow: 0 0 20px #00ffcc;
+  }
+}
+
+/* ==========================================
+   📱 手機直式：以視窗百分比重新排版
+   ========================================== */
+@media (max-width: 768px) and (orientation: portrait) {
+
+  /* 離開按鈕移到右上角，不再壓住底部滑桿 */
+  #exit-btn {
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+    right: 12px;
+    bottom: auto;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 0.9rem;
+    gap: 6px;
+  }
+
+  /* 滑桿外框：寬度 94vw，左右各留 3vw */
+  .sun-slider-wrap {
+    bottom: max(16px, env(safe-area-inset-bottom, 0px));
+    left: 50%;
+    width: 94vw;
+    max-width: 94vw;
+    height: 56px;
+    gap: 2vw;
+    padding: 0 3vw;
+    box-sizing: border-box;
+    justify-content: space-between;
+  }
+
+  /* 標題、圓球、圓盤依視窗寬度縮放 */
+  .sun-slider-title {
+    font-size: clamp(11px, 3.4vw, 15px);
+    margin: 0 1vw;
+  }
+
+  .sun-orb {
+    width: clamp(20px, 6.5vw, 26px);
+    height: clamp(20px, 6.5vw, 26px);
+  }
+
+  .sun-dial {
+    width: clamp(36px, 12vw, 48px);
+    height: clamp(36px, 12vw, 48px);
+  }
+
+  /* 軌道彈性伸縮，不再固定 130px */
+  .sun-range {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+  }
+
+  .sun-divider {
+    flex-shrink: 0;
   }
 }
