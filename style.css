@@ -404,7 +404,7 @@ body {
 /* ==========================================
    📱 手機版說明框：收合 / 展開 / 放大文字
    ========================================== */
-/* @media (max-width: 768px) {
+@media (max-width: 768px) {
   #instructions {
     pointer-events: auto;
     width: 300px;
@@ -434,12 +434,12 @@ body {
   }
 
   #instructions h3 {
-    font-size: 23px;
+    font-size: 16px;
   }
 
   #instructions li {
-    font-size: 21px;
-    line-height: 2.1;
+    font-size: 14px;
+    line-height: 1.8;
   }
 
   #instructions li strong {
@@ -449,7 +449,7 @@ body {
   #instructions.expanded .instructions-close-btn {
     display: flex;
   }
-} */
+}
 
 /* ==========================================
    ◉ 左下角收合按鈕（手機）
@@ -794,7 +794,7 @@ body {
 /* ==========================================
    📱 手機直式：以視窗百分比重新排版
    ========================================== */
-@media (max-width: 768px) and (orientation: portrait) {
+@media (max-width: 768px) {
 
   /* 離開按鈕移到右上角，不再壓住底部滑桿 */
   #exit-btn {
